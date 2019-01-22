@@ -17,7 +17,7 @@ void main() {
 
   // Back Layer
 
-  vec3 colorText = vec3(0.0);
+  vec3 colorText = vec3(0.99, 0.2, 0.42);
 
   float xCell = floor(gl_FragCoord.x / CHECKER_SIZE);
   float yCell = floor(gl_FragCoord.y / CHECKER_SIZE);
@@ -28,11 +28,11 @@ void main() {
 
   // Front Layer
 
-  float isBigText = step(0.5, greyLevel);
+  float isBigText = step(0.2, greyLevel);
   vec3 textBig0 = vec3(1.0, 0.4, 0.23);
   vec3 textBig1 = vec3(1.0, 0.44, 0.66);
   vec3 textBig = mix(textBig0, textBig1, vUv.y);
-  vec3 textSmall = vec3(0.99, 0.2, 0.42);
+  vec3 textSmall = vec3(0.34, 0.19, 0.56);
   vec3 frontText = mix(textSmall, textBig, isBigText);
 
   vec3 frontBg = vec3(1.0);
