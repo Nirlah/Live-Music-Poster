@@ -1,42 +1,51 @@
-class BVectorField extends Block {
-
+class VectorField extends Block {
   init() {
-    this.push = 0;
-    this.canvas.rectMode(CENTER);
-    this.canvas.fill(this.artParams.color);
-    this.canvas.noStroke();
-  }
+    this.time = 0;
 
-  draw() {
-    this.push += song[this.artParams.freq] / 15;
-
-    const halfSize = this.artParams.size / 2;
-
-    this.iterateGrid(this.artParams.size, (x, y) => {
-      let angle;
-      if (this.artParams.vertical) {
-        angle = noise(x / this.artParams.noiseFactor, y / this.artParams.noiseFactor + this.push);
-      } else {
-        angle = noise(x / this.artParams.noiseFactor + this.push, y / this.artParams.noiseFactor);
-      }
-      this.canvas.translate(x + halfSize, y + halfSize);
-      // const angle = base + this.push % 1.0;
-      this.canvas.rotate(map(angle, 0, 1, 0, TWO_PI))
-      this.canvas.rect(0, 0, this.artParams.size, this.artParams.weight);
-
-
-      this.canvas.resetMatrix();
+    const geometry = new THREE.PlaneBufferGeometry(this.artParams.size, this.artParams.weight);
+    const material = new THREE.MeshBasicMaterial({
+      color: this.artParams.color
     });
+    const push = this.artParams.size + this.artParams.gap;
+
+    const iterator = (column, row) => {
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.x = column * push;
+      mesh.position.y = -row * push;
+      return mesh;
+    }
+
+    return this.createGridGroup(
+      this.artParams.columns,
+      this.artParams.rows,
+      iterator
+    )
+  }
+
+  animate() {
+    this.time += song[this.artParams.freq] / 30;
+
+    const iterator = (object, column, row) => {
+      const angle = noise(column / this.artParams.noiseFactor + this.time, row / this.artParams.noiseFactor);
+      object.rotation.z = map(angle, 0, 1, 0, 2 * Math.PI);
+    }
+
+    this.iterateGridGroup(
+      this.artParams.columns,
+      this.artParams.rows,
+      iterator)
   }
 }
 
-BVectorField.prototype.isDynamic = true;
+VectorField.prototype.artDefaults = {
+  color: new THREE.Color('#000000'),
+  columns: 6,
+  rows: 4,
+  size: 1.5,
+  weight: 0.5,
+  gap: 0.35,
+  freq: 'highMid',
+  noiseFactor: 30
+};
 
-BVectorField.prototype.artDefaults = {
-  color: '0',
-  size: 50,
-  weight: 3,
-  noiseFactor: 1000,
-  freq: 'high',
-  vertical: false
-}
+Composition.registerType(VectorField);

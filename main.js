@@ -1,63 +1,143 @@
-// Resources
-let audio, logo, staticNoise, tempBox;
-let textures = {};
-let fontSans, fontSansItalic, fontSerif, fontMono, fontMonoBold;
+// 📦
+const scene = new THREE.Scene();
+scene.background = COLORS.white;
 
-// Managers
-let song, grid;
+// 📹
+const camera = new THREE.PerspectiveCamera(40, WIDTH / HEIGHT, 0.1, 1000);
+camera.position.z = 20;
 
-function preload() {
-  // Load Song
-  audio = loadSound('assets/songs/area.mp3');
+// 🎨
+const renderer = new THREE.WebGLRenderer({
+  antialias: true
+});
+renderer.setSize(WIDTH, HEIGHT);
+renderer.setPixelRatio(window.devicePixelRatio || 1);
+document.body.appendChild(renderer.domElement);
 
-  // Load Fonts
-  fontSans = loadFont('assets/fonts/IBMPlexSans-Regular.otf');
-  fontSansItalic = loadFont('assets/fonts/IBMPlexSans-Italic.otf');
-  fontSerif = loadFont('assets/fonts/IBMPlexSerif-Medium.otf');
-  fontMono = loadFont('assets/fonts/IBMPlexMono-Regular.otf');
-  fontMonoBold = loadFont('assets/fonts/IBMPlexMono-MediumItalic.otf');
+// 🎸
+const song = new Song('assets/audio/area.mp3', camera);
 
-  // Load Images
-  logo = loadImage('assets/logo.svg');
-  staticNoise = loadImage('assets/noise.jpg');
-  tempBox = loadImage('assets/temp-box.png');
+// 🧩
+const composition = new Composition(scene);
+function addCompositionBlocks() {
 
-  // Load Textures
-  textures.bigdot = loadImage('assets/textures/bigdot.png');
-  textures.contours = loadImage('assets/textures/contours.png');
-  textures.funkygerms = loadImage('assets/textures/funkygerms.png');
-  textures.leppard = loadImage('assets/textures/leppard.png');
-  textures.littlesticks = loadImage('assets/textures/littlesticks.png');
-  textures.smalldot = loadImage('assets/textures/smalldot.png');
-  textures.worms = loadImage('assets/textures/worms.png');
+  // Bottom layer (-∞, 0) ------------------------------------------------------
+
+  composition.addBlock(HalftoneClouds, [-13.5, -8.5, -3], null, {
+    columns: 48,
+    rows: 170,
+    maxScale: 0.4,
+    color: COLORS.blue
+  });
+
+  // composition.addBlock(GridWave, [-10.75, 3.2, -1.3], [0.5, 0.6, 0]);
+
+  composition.addBlock(HalftoneGradient, [9.75, -7.5, -1], [0, 0, -0.2], {
+    columns: 25,
+    rows: 50,
+    size: 0.1,
+    minScale: 0.1,
+    maxScale: 0.1,
+    color: COLORS.black
+  })
+
+  // Middle layer [0, 2) -------------------------------------------------------
+
+  composition.addBlock(ColorClouds, [0.75, 0, 0], [0, 0, 0.08], {
+    height: 17,
+    width: 18,
+    factor: 700,
+    colors: [COLORS.babyPink, COLORS.pink]
+  });
+
+  composition.addBlock(ColorClouds, [-4.3, -1, 0.01], [0, 0, -0.2], {
+    height: 7,
+    width: 9,
+    factor: 900,
+    colors: [COLORS.red, COLORS.orange]
+  });
+
+
+  // composition.addBlock(ColorClouds, [-5.3, 3.8, 0.02], null, {
+  //   height: 4,
+  //   width: 3,
+  //   factor: 800,
+  //   colors: [COLORS.purple, COLORS.pink]
+  // });
+
+
+  // composition.addBlock(StepBars, [7, -4, 0.1], [0, 0, Math.PI], {
+  //   colorLow: COLORS.pink,
+  //   colorHigh: COLORS.babyPink
+  // });
+
+  composition.addBlock(CirclesGrid, [-10, -7, 0.1], [0, 0, 0.25], {
+    color: COLORS.blue,
+    rows: 2,
+    columns: 4,
+    gap: 1,
+    size: 1.2
+  });
+
+  composition.addBlock(ColorClouds, [0.75, -4.5, 0.18], [0, 0, -0.2], {
+    height: 6,
+    width: 7,
+    factor: 400,
+    colors: [COLORS.yellow, COLORS.turquoise]
+  });
+
+  composition.addBlock(VectorField, [-4.75, -2.5, 0.19], null, {
+    color: COLORS.blue,
+    weight: 0.025,
+    size: 0.5,
+    gap: 0,
+    columns: 30,
+    rows: 10,
+    freq: 'mid'
+  });
+
+  composition.addBlock(CirclesGrid, [-2, -7.8, 0.2], [0, 0, -0.25], {
+    color: COLORS.purple,
+    rows: 3,
+    columns: 2,
+    gap: 1,
+    size: 3,
+    segments: 64
+  });
+
+  composition.addBlock(HalftoneGradient, [5.75, -7.5, 0.5], [0, 0, 0.1], {
+    columns: 35,
+    rows: 40,
+    size: 0.13,
+    maxScale: 0.4,
+    color: COLORS.white
+  })
+
+  composition.addBlock(VectorField, [-11.5, 7.25, 0.5], null, {
+    color: COLORS.yellow,
+    rows: 5
+  });
+
+  composition.addBlock(TimeSphere, [-8.3, -4.5, 1]);
+
+  // Top layer [2, +∞) ---------------------------------------------------------
+
+  composition.addBlock(GridWave, [-6.75, 2.5, 3], [0.5, 0.6, -0.1]);
+  composition.addBlock(MetaInfo, [-6, 2.5, 5], [0, 0, 0.12]);
+
+  composition.addBlock(LogoPage, [4.15, 4, 4], [0, 0, -0.07]);
 }
 
-function setup() {
-  createCanvas(WIDTH, HEIGHT);
-
-  grid = new Grid();
-  song = new Song(audio);
-
-  grid.addBlock(BLOCK_TYPES.staticClouds, [0, 0], [6, 12]);
-  grid.addBlock(BLOCK_TYPES.staticClouds, [3, 7], [7, 13], { noise: true, colors: [COLORS.pink, COLORS.blue] });
-  grid.addBlock(BLOCK_TYPES.halftoneCircle, [2, 3], [8, 8], { color: 255, blend: SOFT_LIGHT });
-  grid.addBlock(BLOCK_TYPES.staticClouds, [0, 0], [2, 4], { noise: true, colors: [COLORS.blue, COLORS.azure] });
-  grid.addBlock(BLOCK_TYPES.staticClouds, [6, 0], [2, 8], { colors: [COLORS.babyPink, COLORS.pink] });
-  grid.addBlock(BLOCK_TYPES.vectorField, [1, 3], [4, 3], { color: COLORS.blue, background: COLORS.babyPink, size: 30, weight: 8, noiseFactor: 750, freq: 'mid', vertical: true });
-  grid.addBlock(BLOCK_TYPES.vectorField, [4, 12.5], [4, 4], { weight: 3, color: 255, blend: OVERLAY });
-  grid.addBlock(BLOCK_TYPES.columnAmp, [0, 9], [3, 3], { color: 255 });
-  grid.addBlock(BLOCK_TYPES.staticClouds, [0, 12], [5, 4], { colors: [COLORS.babyPink, COLORS.lightYellow] });
-  grid.addBlock(BLOCK_TYPES.echoCircles, [6, 1], [2, 2], { color: COLORS.yellow });
-
-  song.play();
+// 🎞
+function animate() {
+  requestAnimationFrame(animate);
+  song.analyze();
+  composition.animate();
+  renderer.render(scene, camera);
 }
 
-function draw() {
-  background(255);
-
-  song.analyzeForFrame();
-
-  grid.drawBlocks();
-  drawSongStrip();
-  drawInfoBox();
-}
+// 🔥
+THREE.DefaultLoadingManager.onLoad = () => {
+  addCompositionBlocks();
+  animate();
+};

@@ -2,33 +2,49 @@
 <html>
 
 <head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.sound.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="style.css">
   <meta charset="utf-8" />
   <title>Music Poster</title>
+  <script src="vendor/three-r100.js"></script>
+  <style>
+    html {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      margin: 0;
+      background-color: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%
+    }
+  </style>
 </head>
 
 <body>
-  <!-- blocks -->
-  <script src="config/colors.js"></script>
-  <script src="lib/block.js"></script>
-  <script src="blocks/halftone-circle.js"></script>
-  <script src="blocks/vector-field.js"></script>
-  <script src="blocks/column-amp.js"></script>
-  <script src="blocks/echo-circles.js"></script>
-  <script src="blocks/text-ball.js"></script>
-  <script src="blocks/static-texture.js"></script>
-  <script src="blocks/static-clouds.js"></script>
-  <script src="blocks/static-gradient.js"></script>
+  <script src="constants.js"></script>
 
-  <!-- lib -->
-  <script src="config/const.js"></script>
+  <!-- Library -->
+  <script src="lib/utils.js"></script>
+  <script src="lib/shaders-bag.js"></script>
+  <script src="lib/block.js"></script>
+  <script src="lib/composition.js"></script>
   <script src="lib/song.js"></script>
-  <script src="lib/grid.js"></script>
-  <script src="lib/info-box.js"></script>
-  <script src="lib/song-strip.js"></script>
+
+  <!-- Blocks -->
+  <script src="blocks/time-sphere.js"></script>
+  <script src="blocks/logo-wave.js"></script>
+  <script src="blocks/logo-page.js"></script>
+  <script src="blocks/meta-info.js"></script>
+  <script src="blocks/color-clouds.js"></script>
+  <script src="blocks/vector-field.js"></script>
+  <script src="blocks/halftone-gradient.js"></script>
+  <script src="blocks/halftone-clouds.js"></script>
+  <script src="blocks/grid-wave.js"></script>
+  <script src="blocks/circles-grid.js"></script>
+  <script src="blocks/step-bars.js"></script>
 
   <script src="main.js"></script>
 </body>
